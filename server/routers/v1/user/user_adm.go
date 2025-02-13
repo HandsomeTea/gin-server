@@ -1,4 +1,4 @@
-package userApi
+package v1UserApi
 
 import (
 	"github.com/gin-gonic/gin"

@@ -6,7 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func RegisterRoutesAll(r *gin.Engine) {
+func RegisterV1Routes(r *gin.Engine) {
 	v1User.RegisterUserRoutes(r)
 	v1User.RegisterUserPubRoutes(r)
 	v1User.RegisterUserAdmRoutes(r)

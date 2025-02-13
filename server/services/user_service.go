@@ -3,6 +3,8 @@ package service
 type userService struct {
 }
 
+var UserService = userService{}
+
 func (user userService) Test() *map[string]int {
 	println("Hello, my name is lhf")
 
@@ -14,5 +16,3 @@ func (user userService) Test() *map[string]int {
 
 	return &result
 }
-
-var UserService = userService{}
