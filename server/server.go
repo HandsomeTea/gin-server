@@ -4,9 +4,9 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func CreateServer() *gin.Engine {
-	server := gin.Default()
-	server.SetTrustedProxies([]string{"127.0.0.1"})
+func CreateRouter() *gin.Engine {
+	router := gin.New()
+	router.SetTrustedProxies([]string{"127.0.0.1"})
 
-	return server
+	return router
 }

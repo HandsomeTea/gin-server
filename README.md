@@ -15,3 +15,6 @@ common http server by go
 - 已有项目安装依赖和运行
   - go mod tidy
   - go run main.go
+
+## 开发相关
+- 使用vscode，安装插件`Go`。

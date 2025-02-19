@@ -22,8 +22,8 @@ var logLevels = map[string]zapcore.Level{
 	"fatal":  zap.FatalLevel,
 }
 
-func customLogFormat(entry zapcore.Entry) string {
-	timeStr := fmt.Sprintf("[%s]", entry.Time.Format("2006-01-02T15:04:05.000Z07:00"))
+func customDevLogFormat(entry zapcore.Entry) string {
+	timeStr := fmt.Sprintf("[%s]", entry.Time.Format("2006-01-02 15:04:05.000"))
 	levelStr := fmt.Sprintf("[%s]", strings.ToUpper(entry.Level.String())) // 将日志级别转换为大写
 	callerStr := fmt.Sprintf("[%s:%d]", entry.Caller.File, entry.Caller.Line)
 	msgStr := entry.Message + "\n"
@@ -54,9 +54,6 @@ var Log *zap.Logger
 func createDevLogger() {
 	encoderConfig := zapcore.EncoderConfig{
 		CallerKey: "caller",
-		EncodeCaller: func(caller zapcore.EntryCaller, enc zapcore.PrimitiveArrayEncoder) {
-			enc.AppendString(fmt.Sprintf("[%s:%d]", caller.File, caller.Line))
-		},
 	}
 
 	level := zap.NewAtomicLevel()
@@ -70,7 +67,7 @@ func createDevLogger() {
 	)
 
 	Log = zap.New(core, zap.AddCaller(), zap.Hooks(func(entry zapcore.Entry) error {
-		fmt.Print(customLogFormat(entry))
+		fmt.Print(customDevLogFormat(entry))
 		return nil
 	}))
 
@@ -78,7 +75,7 @@ func createDevLogger() {
 }
 
 func customTraceLogFormat(entry zapcore.Entry) string {
-	timeStr := fmt.Sprintf("[%s]", entry.Time.Format("2006-01-02T15:04:05.000Z07:00"))
+	timeStr := fmt.Sprintf("[%s]", entry.Time.Format("2006-01-02 15:04:05.000 Z07:00"))
 	levelStr := fmt.Sprintf("[%s]", strings.ToUpper(entry.Level.String())) // 将日志级别转换为大写
 	msgStr := entry.Message + "\n"
 
@@ -127,7 +124,7 @@ func createTraceLogger() {
 }
 
 func customSystemLoggerFormat(entry zapcore.Entry) string {
-	timeStr := fmt.Sprintf("[%s]", entry.Time.Format("2006-01-02T15:04:05.000Z07:00"))
+	timeStr := fmt.Sprintf("[%s]", entry.Time.Format("2006-01-02 15:04:05.000"))
 	levelStr := fmt.Sprintf("[%s]", strings.ToUpper(entry.Level.String())) // 将日志级别转换为大写
 	msgStr := entry.Message + "\n"
 
