@@ -4,7 +4,9 @@ import (
 	"gin-server/server"
 	env "gin-server/server/configs/env"
 	logger "gin-server/server/configs/logger"
+	dbs "gin-server/server/dbs"
 	middleware "gin-server/server/middlewares"
+	models "gin-server/server/models"
 	v1 "gin-server/server/routers/v1"
 	"net/http"
 	"strconv"
@@ -24,6 +26,9 @@ func main() {
 	gin.DebugPrintRouteFunc = func(httpMethod, absolutePath, handlerName string, nuHandlers int) {
 		logger.SystemLog.Debug(httpMethod + ": " + absolutePath + " --> " + handlerName + " (" + strconv.Itoa(nuHandlers) + " handlers)")
 	}
+
+	dbs.ConnectMongodb()
+	models.Test.InitModel()
 
 	router := server.CreateRouter()
 
@@ -47,6 +52,6 @@ func main() {
 
 	v1.RegisterV1Routes(router)
 
-	logger.SystemLog.Debug("Server is running on port 8084")
+	logger.SystemLog.Info("Server is running on port 8084")
 	http.ListenAndServe(":"+env.GetEnv("PORT"), router)
 }

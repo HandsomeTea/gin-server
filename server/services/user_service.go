@@ -1,7 +1,8 @@
-package service
+package services
 
 import (
 	response "gin-server/server/configs/response"
+	models "gin-server/server/models"
 
 	"github.com/gin-gonic/gin"
 )
@@ -12,7 +13,6 @@ type userService struct {
 var UserService = userService{}
 
 func (user userService) TestApi(c *gin.Context) {
-	print("进入接口逻辑")
 	// query := c.DefaultQuery("ss", "123")
 	// query := c.Query("ss")
 	// param := c.Param("test")
@@ -34,6 +34,21 @@ func (user userService) TestApi(c *gin.Context) {
 	// 	return
 	// }
 
-	print("已响应客户端还继续执行了")
+	// models.Test.InsertOne(models.TestModel{
+	// 	Name: "test",
+	// })
+
+	// var datas []interface{}
+	// test := models.TestModel{
+	// 	Name: "test",
+	// }
+	// for i := 0; i < 1; i++ {
+	// 	datas = append(datas, test)
+	// }
+	// models.Test.InsertMany(datas)
+
+	// response.Ctx(c).Success(models.Test.FindOne(map[string]interface{}{}))
+	// response.Ctx(c).Success(models.Test.Find(map[string]interface{}{}))
+	models.Test.DeleteOne(map[string]interface{}{"_id": "67b58ca3053d57baa9733047"})
 	response.Ctx(c).Success()
 }
