@@ -2,7 +2,6 @@ package services
 
 import (
 	response "gin-server/server/configs/response"
-	models "gin-server/server/models"
 
 	"github.com/gin-gonic/gin"
 )
@@ -49,6 +48,13 @@ func (user userService) TestApi(c *gin.Context) {
 
 	// response.Ctx(c).Success(models.Test.FindOne(map[string]interface{}{}))
 	// response.Ctx(c).Success(models.Test.Find(map[string]interface{}{}))
-	models.Test.DeleteOne(map[string]interface{}{"_id": "67b58ca3053d57baa9733047"})
+	// models.Test.Find(
+	// 	bson.M{
+	// 		"_id": bson.M{
+	// 			"$in": []bson.ObjectID{models.TransformId("67b57ff73c3bda009a14b3b3"), models.TransformId("67b57fe8dd94b606b7d4e9f1")},
+	// 		},
+	// 	},
+	// )
+	// models.Test.DeleteOne(map[string]interface{}{"_id": "67b58ca3053d57baa9733047"})
 	response.Ctx(c).Success()
 }
