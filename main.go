@@ -6,7 +6,9 @@ import (
 	logger "gin-server/server/configs/logger"
 	dbs "gin-server/server/dbs"
 	middleware "gin-server/server/middlewares"
-	models "gin-server/server/models"
+
+	// models "gin-server/server/models/mysql/go-sql-driver"
+	models "gin-server/server/models/mysql/gorm"
 	v1 "gin-server/server/routers/v1"
 	"net/http"
 	"strconv"
@@ -27,7 +29,10 @@ func main() {
 		logger.SystemLog.Debug(httpMethod + ": " + absolutePath + " --> " + handlerName + " (" + strconv.Itoa(nuHandlers) + " handlers)")
 	}
 
-	dbs.ConnectMongodb()
+	// dbs.ConnectMongodb()
+	// models.Test.InitModel()
+
+	dbs.ConnectMysql()
 	models.Test.InitModel()
 
 	router := server.CreateRouter()

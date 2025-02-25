@@ -2,6 +2,7 @@ package services
 
 import (
 	response "gin-server/server/configs/response"
+	models "gin-server/server/models/mysql/gorm"
 
 	"github.com/gin-gonic/gin"
 )
@@ -33,6 +34,7 @@ func (user userService) TestApi(c *gin.Context) {
 	// 	return
 	// }
 
+	// =================================== mongodb ======================================
 	// models.Test.InsertOne(models.TestModel{
 	// 	Name: "test",
 	// })
@@ -48,13 +50,33 @@ func (user userService) TestApi(c *gin.Context) {
 
 	// response.Ctx(c).Success(models.Test.FindOne(map[string]interface{}{}))
 	// response.Ctx(c).Success(models.Test.Find(map[string]interface{}{}))
-	// models.Test.Find(
+	// response.Ctx(c).Success(models.Test.Find(
 	// 	bson.M{
 	// 		"_id": bson.M{
 	// 			"$in": []bson.ObjectID{models.TransformId("67b57ff73c3bda009a14b3b3"), models.TransformId("67b57fe8dd94b606b7d4e9f1")},
 	// 		},
 	// 	},
-	// )
+	// ))
 	// models.Test.DeleteOne(map[string]interface{}{"_id": "67b58ca3053d57baa9733047"})
+
+	// =================================== go-sql-driver/mysql ======================================
+	// models.Test.QueryMany("select * from test")
+	// models.Test.Exec("insert into test (name) values ('test insert')")
+	// models.Test.Exec("insert into user (name, mark) values ('lhf1', '2112')")
+
+	// =================================== gorm ======================================
+	// filter := &models.TestModel{
+	// 	ID: 3,
+	// }
+	// models.Test.FindMany(filter)
+	// models.Test.Paging(filter, 0, 10)
+	// response.Ctx(c).Success(models.Test.InsertOne(&models.TestModel{
+	// 	Name: "gorm insert test aaa",
+	// }))
+	models.Test.InsertMany([]*models.TestModel{
+		{
+			Name: "gorm insert many test123 aasssa",
+		},
+	})
 	response.Ctx(c).Success()
 }
