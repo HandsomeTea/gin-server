@@ -1,4 +1,4 @@
-package apigateway
+package api
 
 import (
 	// "gin-server/server/services"

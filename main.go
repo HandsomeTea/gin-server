@@ -9,6 +9,7 @@ import (
 
 	// models "gin-server/server/models/mysql/go-sql-driver"
 	models "gin-server/server/models/mysql/gorm"
+	"gin-server/server/routers/gateway"
 	v1 "gin-server/server/routers/v1"
 	"net/http"
 	"strconv"
@@ -58,6 +59,7 @@ func main() {
 	router.Use(middlewares.AcceptRequestHandle)
 
 	v1.RegisterV1Routes(router)
+	gateway.RegisterGateway(router)
 
 	logger.SystemLog.Info("Server is running on port " + env.GetEnv("PORT"))
 	http.ListenAndServe(":"+env.GetEnv("PORT"), router)
