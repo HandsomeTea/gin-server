@@ -1,7 +1,7 @@
-package v1UserApi
+package v1user
 
 import (
-	services "gin-server/server/services"
+	"gin-server/server/services"
 
 	"github.com/gin-gonic/gin"
 )

@@ -1,7 +1,7 @@
 package models
 
 import (
-	dbs "gin-server/server/dbs"
+	"gin-server/server/dbs"
 )
 
 type test struct {

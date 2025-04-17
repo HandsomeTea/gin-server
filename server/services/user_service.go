@@ -1,14 +1,13 @@
 package services
 
 import (
-	response "gin-server/server/configs/response"
+	"gin-server/server/configs/response"
 	models "gin-server/server/models/mysql/gorm"
 
 	"github.com/gin-gonic/gin"
 )
 
-type userService struct {
-}
+type userService struct{}
 
 var UserService = userService{}
 
@@ -78,5 +77,7 @@ func (user userService) TestApi(c *gin.Context) {
 			Name: "gorm insert many test123 aasssa",
 		},
 	})
+	// aa := ""
+	// print(aa[1])
 	response.Ctx(c).Success()
 }

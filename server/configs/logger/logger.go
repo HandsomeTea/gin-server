@@ -9,7 +9,7 @@ import (
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 
-	env "gin-server/server/configs/env"
+	"gin-server/server/configs/env"
 )
 
 var logLevels = map[string]zapcore.Level{

@@ -2,10 +2,10 @@ package main
 
 import (
 	"gin-server/server"
-	env "gin-server/server/configs/env"
-	logger "gin-server/server/configs/logger"
-	dbs "gin-server/server/dbs"
-	middleware "gin-server/server/middlewares"
+	"gin-server/server/configs/env"
+	"gin-server/server/configs/logger"
+	"gin-server/server/dbs"
+	"gin-server/server/middlewares"
 
 	// models "gin-server/server/models/mysql/go-sql-driver"
 	models "gin-server/server/models/mysql/gorm"
@@ -53,10 +53,12 @@ func main() {
 	// 在接口逻辑中c.Abort()只会组织洋葱模型向内层继续执行，不会组织洋葱模型向外层继续执行，即不会组织洋葱模型中后续后置中间件的执行
 	// 一般在接口逻辑中c.Abort()，同时还需要再c.Error(xxx)，return，并在后置中间件中处理c.Errors，这样就可以在接口逻辑中向客户端返回错误信息，并在后置中间件中记录错误日志
 
-	router.Use(middleware.AcceptRequestHandle())
+	router.NoRoute(middlewares.NoRouteHandle) // 因为gin默认处理了404，所以这里需要自定义处理404
+	router.Use(middlewares.ExceptionHandle)
+	router.Use(middlewares.AcceptRequestHandle)
 
 	v1.RegisterV1Routes(router)
 
-	logger.SystemLog.Info("Server is running on port 8084")
+	logger.SystemLog.Info("Server is running on port " + env.GetEnv("PORT"))
 	http.ListenAndServe(":"+env.GetEnv("PORT"), router)
 }

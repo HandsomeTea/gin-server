@@ -2,10 +2,11 @@ package response
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	httpError "gin-server/server/configs/error"
-	logger "gin-server/server/configs/logger"
+	"gin-server/server/configs/logger"
 
 	"github.com/gin-gonic/gin"
 )
@@ -66,6 +67,8 @@ func (response *response) Failed(data ...any) {
 
 		if isString {
 			errorException.Message = message
+		} else {
+			errorException.Message = fmt.Sprintf("%v", data[0])
 		}
 	}
 

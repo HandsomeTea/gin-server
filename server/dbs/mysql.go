@@ -1,8 +1,8 @@
 package dbs
 
 import (
-	env "gin-server/server/configs/env"
-	logger "gin-server/server/configs/logger"
+	"gin-server/server/configs/env"
+	"gin-server/server/configs/logger"
 	"net/url"
 
 	// _ "github.com/go-sql-driver/mysql"

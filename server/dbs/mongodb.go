@@ -2,8 +2,8 @@ package dbs
 
 import (
 	"context"
-	env "gin-server/server/configs/env"
-	logger "gin-server/server/configs/logger"
+	"gin-server/server/configs/env"
+	"gin-server/server/configs/logger"
 	"net/url"
 
 	"go.mongodb.org/mongo-driver/v2/mongo"
