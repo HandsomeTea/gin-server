@@ -43,10 +43,10 @@ func customDevLogFormat(entry zapcore.Entry) string {
 	case zapcore.PanicLevel:
 		line = color.HiMagentaString("%s %s %s %s", timeStr, levelStr, callerStr, msgStr)
 	default:
-		line = fmt.Sprintf("%s %s %s %s", timeStr, levelStr, callerStr, msgStr) // 默认颜色
+		line = fmt.Sprintf("%s %s %s %s", timeStr, levelStr, callerStr, msgStr)
 	}
 
-	return line + "\n" // 添加换行符
+	return line + "\n"
 }
 
 var Log *zap.Logger
@@ -76,7 +76,7 @@ func createDevLogger() {
 
 func customTraceLogFormat(entry zapcore.Entry) string {
 	timeStr := fmt.Sprintf("[%s]", entry.Time.Format("2006-01-02 15:04:05.000 Z07:00"))
-	levelStr := fmt.Sprintf("[%s]", strings.ToUpper(entry.Level.String())) // 将日志级别转换为大写
+	levelStr := fmt.Sprintf("[%s]", strings.ToUpper(entry.Level.String()))
 	msgStr := entry.Message + "\n"
 
 	var line string
@@ -94,10 +94,10 @@ func customTraceLogFormat(entry zapcore.Entry) string {
 	case zapcore.PanicLevel:
 		line = color.HiMagentaString("%s %s %s", timeStr, levelStr, msgStr)
 	default:
-		line = fmt.Sprintf("%s %s %s", timeStr, levelStr, msgStr) // 默认颜色
+		line = fmt.Sprintf("%s %s %s", timeStr, levelStr, msgStr)
 	}
 
-	return line + "\n" // 添加换行符
+	return line + "\n"
 }
 
 var TraceLog *zap.Logger
@@ -125,7 +125,7 @@ func createTraceLogger() {
 
 func customSystemLoggerFormat(entry zapcore.Entry) string {
 	timeStr := fmt.Sprintf("[%s]", entry.Time.Format("2006-01-02 15:04:05.000"))
-	levelStr := fmt.Sprintf("[%s]", strings.ToUpper(entry.Level.String())) // 将日志级别转换为大写
+	levelStr := fmt.Sprintf("[%s]", strings.ToUpper(entry.Level.String()))
 	msgStr := entry.Message + "\n"
 
 	var line string
@@ -143,10 +143,10 @@ func customSystemLoggerFormat(entry zapcore.Entry) string {
 	case zapcore.PanicLevel:
 		line = color.HiMagentaString("%s %s [SYSTEM] %s", timeStr, levelStr, msgStr)
 	default:
-		line = fmt.Sprintf("%s %s [SYSTEM] %s", timeStr, levelStr, msgStr) // 默认颜色
+		line = fmt.Sprintf("%s %s [SYSTEM] %s", timeStr, levelStr, msgStr)
 	}
 
-	return line + "\n" // 添加换行符
+	return line + "\n"
 }
 
 var SystemLog *zap.Logger

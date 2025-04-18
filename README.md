@@ -20,5 +20,5 @@ common http server by go
 - 使用vscode，安装插件`Go`。
 - 热加载：
   - 安装`air`：`go install github.com/air-verse/air@latest`。
-  - 检查`air`是否安装成功：`air -v`。
+  - 检查`air`是否安装成功：`air -v`，不成功一般是因为`air`安装在了go的工作区，把工作区中的`air`做软连接。
   - 运行：`air`。

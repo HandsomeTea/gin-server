@@ -10,7 +10,7 @@ type apiGatewayService struct{}
 
 var ApiGatewayService = apiGatewayService{}
 
-func (user apiGatewayService) CliAuth(c *gin.Context) {
+func (svc apiGatewayService) CliAuth(c *gin.Context) {
 	path := c.Param("path")
 
 	// print(path[100])
@@ -18,13 +18,13 @@ func (user apiGatewayService) CliAuth(c *gin.Context) {
 	response.Ctx(c).Success(map[string]string{"path": path, "auth": "cli"})
 }
 
-func (user apiGatewayService) LoginAuth(c *gin.Context) {
+func (svc apiGatewayService) LoginAuth(c *gin.Context) {
 	path := c.Param("path")
 
 	response.Ctx(c).Success(map[string]string{"path": path, "auth": "login"})
 }
 
-func (user apiGatewayService) PubAuth(c *gin.Context) {
+func (svc apiGatewayService) PubAuth(c *gin.Context) {
 	path := c.Param("path")
 
 	response.Ctx(c).Success(map[string]string{"path": path, "auth": "pub"})

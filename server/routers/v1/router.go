@@ -1,13 +1,13 @@
 package v1
 
 import (
-	v1User "gin-server/server/routers/v1/user"
+	v1UserApi "gin-server/server/routers/v1/user"
 
 	"github.com/gin-gonic/gin"
 )
 
 func RegisterV1Routes(r *gin.Engine) {
-	v1User.RegisterUserRoutes(r)
-	v1User.RegisterUserPubRoutes(r)
-	v1User.RegisterUserAdmRoutes(r)
+	v1UserApi.RegisterUserRoutes(r)
+	v1UserApi.RegisterUserPubRoutes(r)
+	v1UserApi.RegisterUserAdmRoutes(r)
 }

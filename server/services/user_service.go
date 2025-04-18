@@ -11,7 +11,7 @@ type userService struct{}
 
 var UserService = userService{}
 
-func (user userService) TestApi(c *gin.Context) {
+func (svc userService) TestApi(c *gin.Context) {
 	// query := c.DefaultQuery("ss", "123")
 	// query := c.Query("ss")
 	// param := c.Param("test")

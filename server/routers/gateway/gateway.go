@@ -1,6 +1,7 @@
 package gateway
 
 import (
+	"gin-server/server/configs/env"
 	"gin-server/server/routers/gateway/api"
 	"gin-server/server/routers/gateway/canary"
 
@@ -8,6 +9,12 @@ import (
 )
 
 func RegisterGateway(r *gin.Engine) {
-	api.RegisterRoutes(r)
-	canary.RegisterRoutes(r)
+	if env.GetEnv("DEPLOY_MODE") == "api-gateway" {
+		api.RegisterRoutes(r)
+	} else if env.GetEnv("DEPLOY_MODE") == "canary" {
+		canary.RegisterRoutes(r)
+	} else {
+		canary.RegisterRoutes(r)
+		api.RegisterRoutes(r)
+	}
 }
