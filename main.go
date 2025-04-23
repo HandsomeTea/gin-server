@@ -9,7 +9,6 @@ import (
 
 	// models "gin-server/server/models/mysql/go-sql-driver"
 	models "gin-server/server/models/mysql/gorm"
-	// apigateway "gin-server/server/routers/api-gateway"
 	v1 "gin-server/server/routers/v1"
 	"net/http"
 	"strconv"
@@ -59,8 +58,6 @@ func main() {
 	router.Use(middlewares.AcceptRequestHandle)
 
 	v1.RegisterV1Routes(router)
-	// 网关服务示例
-	// apigateway.RegisterApiGateway(router)
 
 	logger.SystemLog.Info("Server is running on port " + env.GetEnv("PORT"))
 	http.ListenAndServe(":"+env.GetEnv("PORT"), router)
