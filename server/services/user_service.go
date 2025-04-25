@@ -11,7 +11,16 @@ type userService struct{}
 
 var UserService = userService{}
 
+// 抛出便于单独测试
+func (svc userService) TestService(data string) string {
+	return data
+}
+
+// ============================================ gin接口处理函数 ============================================
+
+/* 测试接口的处理函数 */
 func (svc userService) TestApi(c *gin.Context) {
+	// ============================================ 尝鲜测试代码 start ============================================
 	// query := c.DefaultQuery("ss", "123")
 	// query := c.Query("ss")
 	// param := c.Param("test")
@@ -79,5 +88,8 @@ func (svc userService) TestApi(c *gin.Context) {
 	})
 	// aa := ""
 	// print(aa[1])
-	response.Ctx(c).Success()
+
+	// ============================================ 尝鲜测试代码 end ============================================
+
+	response.Ctx(c).Success(svc.TestService("你好"))
 }

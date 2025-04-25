@@ -2,23 +2,29 @@ package middlewares
 
 import (
 	"encoding/json"
+	"html"
 	"io"
 	"strings"
 
 	"gin-server/server/configs/logger"
+	"gin-server/server/globals"
 
 	"github.com/gin-gonic/gin"
 )
 
 /*收到请求设置trace日志*/
 func AcceptRequestHandle(c *gin.Context) {
-	var headerMap = make(map[string]interface{})
-	var queryMap = make(map[string]interface{})
-	var paramMap = make(map[string]interface{})
-	var bodyMap = make(map[string]interface{})
+	headerMap := make(map[string]string)
+	queryMap := make(map[string]string)
+	paramMap := make(map[string]string)
+	bodyMap := make(map[string]interface{})
 
 	for k := range c.Request.Header {
-		headerMap[k] = c.GetHeader(k)
+		if strings.EqualFold(k, "Authorization") || strings.EqualFold(k, "Token") {
+			headerMap[k] = "***REDACTED***"
+		} else {
+			headerMap[k] = c.GetHeader(k)
+		}
 	}
 	for k := range c.Request.URL.Query() {
 		queryMap[k] = c.Query(k)
@@ -27,21 +33,43 @@ func AcceptRequestHandle(c *gin.Context) {
 		paramMap[param.Key] = param.Value
 	}
 
-	if c.ContentType() == "application/json" {
+	if strings.HasPrefix(c.ContentType(), "application/json") {
 		var bodyBytes []byte
+
 		if c.Request.Body != nil {
-			bodyBytes, _ = io.ReadAll(c.Request.Body)
-			c.Request.Body = io.NopCloser(strings.NewReader(string(bodyBytes)))
+			maxBodySize := int64(10 << 20) // 10MB
+			_bodyBytes, e := io.ReadAll(io.LimitReader(c.Request.Body, maxBodySize))
+
+			if e != nil {
+				panic(globals.NewException(e.Error()))
+			}
+			bodyBytes = _bodyBytes
+			c.Request.Body = io.NopCloser(strings.NewReader(string(_bodyBytes)))
 		}
 		bodyJsonString := strings.Trim(string(bodyBytes), "\n")
-		json.Unmarshal([]byte(bodyJsonString), &bodyMap)
+
+		if er := json.Unmarshal([]byte(bodyJsonString), &bodyMap); er != nil {
+			panic(globals.NewException(er.Error()))
+		}
+	} else if c.ContentType() == "application/x-www-form-urlencoded" || c.ContentType() == "multipart/form-data" {
+		if err := c.Request.ParseForm(); err == nil {
+			bodyMap = make(map[string]interface{})
+
+			for k, v := range c.Request.PostForm {
+				if len(v) == 1 {
+					bodyMap[k] = v[0]
+				} else {
+					bodyMap[k] = v
+				}
+			}
+		}
 	}
 
 	type RequestDataType struct {
-		Header map[string]interface{} `json:"header"`
-		Query  map[string]interface{} `json:"query"`
+		Header map[string]string      `json:"header"`
+		Query  map[string]string      `json:"query"`
 		Body   map[string]interface{} `json:"body"`
-		Param  map[string]interface{} `json:"param"`
+		Param  map[string]string      `json:"param"`
 	}
 
 	requestData := RequestDataType{
@@ -50,8 +78,12 @@ func AcceptRequestHandle(c *gin.Context) {
 		Body:   bodyMap,
 		Param:  paramMap,
 	}
-	requestDataJson, _ := json.MarshalIndent(requestData, "", "    ")
-	logger.TraceLog.Info("[http-request] " + c.Request.Method + ": " + c.Request.URL.RequestURI() + " " + string(requestDataJson))
+	requestDataJson, err := json.MarshalIndent(requestData, "", "    ")
+
+	if err != nil {
+		panic(globals.NewException(err.Error()))
+	}
+	logger.TraceLog.Info("[http-request] " + c.Request.Method + ": " + html.EscapeString(c.Request.URL.RequestURI()) + " " + string(requestDataJson))
 
 	c.Set("query", queryMap)
 	c.Set("body", bodyMap)

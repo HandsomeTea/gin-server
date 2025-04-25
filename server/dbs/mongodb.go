@@ -13,7 +13,7 @@ import (
 var Mongodb *mongo.Database
 
 func ConnectMongodb() {
-	mongodbAddress := env.GetEnv("DB_URL")
+	mongodbAddress, _ := env.GetEnv("DB_URL")
 	client, err := mongo.Connect(options.Client().ApplyURI(mongodbAddress))
 
 	if err != nil {

@@ -12,7 +12,7 @@ import (
 )
 
 func getDbDSN() (string, string) {
-	mysqlAddress := env.GetEnv("DB_URL")
+	mysqlAddress, _ := env.GetEnv("DB_URL")
 	dbUrl, _ := url.Parse(mysqlAddress)
 
 	userName := dbUrl.User.Username()
