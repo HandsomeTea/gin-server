@@ -13,6 +13,8 @@ var UserService = userService{}
 
 // 抛出便于单独测试
 func (svc userService) TestService(data string) string {
+	// 直接使用panic抛出异常，不需要return error，全局异常处理会捕获并返回
+	// panic(globals.NewException("other auth service not implemented"))
 	return data
 }
 
@@ -91,5 +93,6 @@ func (svc userService) TestApi(c *gin.Context) {
 
 	// ============================================ 尝鲜测试代码 end ============================================
 
+	// 不需要处理错误，因为svc.TestService中已经直接使用panic抛出错误，全局也有error中间件捕获处理
 	response.Ctx(c).Success(svc.TestService("你好"))
 }
