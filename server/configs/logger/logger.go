@@ -158,6 +158,14 @@ func Close() {
 	TraceLog.Sync()
 }
 
+func enrichLoggerWithOtel(log *zap.Logger) *zap.Logger {
+	return log.WithOptions(zap.WrapCore(func(core zapcore.Core) zapcore.Core {
+		return &OtelCore{
+			Core: core,
+		}
+	}))
+}
+
 func init() {
 	logLevel, _ := env.GetEnv("LOG_LEVEL")
 	traceLogLevel, _ := env.GetEnv("TRACE_LOG_LEVEL")
@@ -174,10 +182,22 @@ func init() {
 		ShowCaller:   true,
 		CustomFormat: customDevLogFormat,
 	})
-	TraceLog = createLogger(loggerConfig{
-		Name:         "trace",
-		DefaultLevel: zapcore.DebugLevel,
-		Level:        traceLogLevel,
-		CustomFormat: customTraceLogFormat,
-	})
+	enabledOtel, _ := env.GetEnv("OTEL_ENABLED")
+
+	if enabledOtel == "yes" {
+		traceLog := createLogger(loggerConfig{
+			Name:         "trace",
+			DefaultLevel: zapcore.DebugLevel,
+			Level:        traceLogLevel,
+			CustomFormat: customTraceLogFormat,
+		})
+		TraceLog = enrichLoggerWithOtel(traceLog)
+	} else {
+		TraceLog = createLogger(loggerConfig{
+			Name:         "trace",
+			DefaultLevel: zapcore.DebugLevel,
+			Level:        traceLogLevel,
+			CustomFormat: customTraceLogFormat,
+		})
+	}
 }

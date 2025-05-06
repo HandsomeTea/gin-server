@@ -1,6 +1,7 @@
 package globals
 
 import (
+	"encoding/json"
 	"fmt"
 
 	httpError "gin-server/server/configs/error"
@@ -14,7 +15,9 @@ type HttpException struct {
 }
 
 func (e *HttpException) Error() string {
-	return e.Message
+	jsons, _ := json.Marshal(e)
+
+	return string(jsons)
 }
 
 /**

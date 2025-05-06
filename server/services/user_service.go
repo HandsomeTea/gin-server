@@ -1,6 +1,7 @@
 package services
 
 import (
+	// httpError "gin-server/server/configs/error"
 	"gin-server/server/configs/response"
 	models "gin-server/server/models/mysql/gorm"
 
@@ -14,7 +15,7 @@ var UserService = userService{}
 // 抛出便于单独测试
 func (svc userService) TestService(data string) string {
 	// 直接使用panic抛出异常，不需要return error，全局异常处理会捕获并返回
-	// panic(globals.NewException("other auth service not implemented"))
+	// panic(globals.NewException("other auth service not implemented", httpError.URL_NOT_FOUND))
 	return data
 }
 

@@ -5,11 +5,13 @@ import (
 	"net/http"
 	"runtime/debug"
 
+	"gin-server/server/configs/env"
 	httpError "gin-server/server/configs/error"
 	"gin-server/server/configs/logger"
 	"gin-server/server/globals"
 
 	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 )
 
 type response struct {
@@ -37,8 +39,14 @@ func (response *response) Success(data ...any) {
 	if err != nil {
 		panic(globals.NewException(err.Error()))
 	}
+	logMsg := "[http-response] " + response.ctx.Request.Method + ": " + response.ctx.Request.URL.RequestURI() + " => " + string(responseDataJson)
+	otelEnabled, _ := env.GetEnv("OTEL_ENABLED")
 
-	logger.TraceLog.Info("[http-response] " + response.ctx.Request.Method + ": " + response.ctx.Request.URL.RequestURI() + " => " + string(responseDataJson))
+	if otelEnabled == "yes" {
+		logger.TraceLog.Info(logMsg, zap.Any("ctx", response.ctx.Request.Context()))
+	} else {
+		logger.TraceLog.Info(logMsg)
+	}
 	response.ctx.JSON(http.StatusOK, result)
 }
 
@@ -55,7 +63,8 @@ func (response *response) Failed(data ...any) {
 	}
 	errorException := globals.NewException(data...)
 	status := httpError.ErrorCodeMap[errorException.Code]
-
+	errorLogMsg := "[http-response] " + response.ctx.Request.Method + ": " + response.ctx.Request.URL.RequestURI() + " => "
+	otelEnabled, _ := env.GetEnv("OTEL_ENABLED")
 	responseDataJson, err := json.MarshalIndent(errorException, "", "    ")
 
 	if err != nil {
@@ -64,12 +73,24 @@ func (response *response) Failed(data ...any) {
 		logger.SystemLog.Error(message + "\n" + string(debug.Stack()))
 		errorException = globals.NewException(message)
 		jsonData, _ := json.MarshalIndent(errorException, "", "    ")
+		errorLogMsg = errorLogMsg + string(jsonData)
 
-		logger.TraceLog.Error("[http-response] " + response.ctx.Request.Method + ": " + response.ctx.Request.URL.RequestURI() + " => " + string(jsonData))
+		if otelEnabled == "yes" {
+			logger.TraceLog.Error(errorLogMsg, zap.Any("ctx", response.ctx.Request.Context()))
+		} else {
+			logger.TraceLog.Error(errorLogMsg)
+		}
+
 		response.ctx.JSON(status, errorException)
 		return
 	}
 
-	logger.TraceLog.Error("[http-response] " + response.ctx.Request.Method + ": " + response.ctx.Request.URL.RequestURI() + " => " + string(responseDataJson))
+	errorLogMsg = errorLogMsg + string(responseDataJson)
+	if otelEnabled == "yes" {
+		logger.TraceLog.Error(errorLogMsg, zap.Any("ctx", response.ctx.Request.Context()))
+	} else {
+		logger.TraceLog.Error(errorLogMsg)
+	}
+
 	response.ctx.JSON(status, errorException)
 }

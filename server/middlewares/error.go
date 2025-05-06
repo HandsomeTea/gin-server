@@ -1,10 +1,12 @@
 package middlewares
 
 import (
+	"encoding/json"
 	"fmt"
 	httpError "gin-server/server/configs/error"
 	"gin-server/server/configs/logger"
 	"gin-server/server/configs/response"
+	"gin-server/server/globals"
 	"html"
 	"runtime/debug"
 
@@ -14,9 +16,12 @@ import (
 func ExceptionHandle(c *gin.Context) {
 	defer func() {
 		if err := recover(); err != nil {
-			message := fmt.Sprintf("%v", err)
-			logger.SystemLog.Error(message + "\n" + string(debug.Stack()))
-			response.Ctx(c).Failed(message)
+			errStr := fmt.Sprintf("%v", err)
+			e := globals.HttpException{}
+			json.Unmarshal([]byte(errStr), &e)
+
+			logger.SystemLog.Error(e.Message + "\n" + string(debug.Stack()))
+			response.Ctx(c).Failed(e.Message, e.Code, e.Data)
 			c.Abort()
 		}
 	}()

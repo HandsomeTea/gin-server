@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"gin-server/server"
 	"gin-server/server/configs/env"
 	"gin-server/server/configs/logger"
@@ -8,6 +9,7 @@ import (
 	"gin-server/server/middlewares"
 
 	// models "gin-server/server/models/mysql/go-sql-driver"
+	global "gin-server/server/globals"
 	models "gin-server/server/models/mysql/gorm"
 	v1 "gin-server/server/routers/v1"
 	"net/http"
@@ -21,6 +23,11 @@ func main() {
 
 	if goEnv == "production" {
 		gin.SetMode(gin.ReleaseMode)
+	}
+	tp, _ := global.InitOtelTracer()
+
+	if tp != nil {
+		defer tp.Shutdown(context.Background())
 	}
 
 	defer logger.Close()
@@ -55,7 +62,7 @@ func main() {
 
 	router.NoRoute(middlewares.NoRouteHandle) // 因为gin默认处理了404，所以这里需要自定义处理404
 	router.Use(middlewares.ExceptionHandle)
-	router.Use(middlewares.AcceptRequestHandle)
+	router.Use(middlewares.AcceptRequestHandle(tp))
 
 	v1.RegisterV1Routes(router)
 
