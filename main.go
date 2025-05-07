@@ -6,10 +6,12 @@ import (
 	"gin-server/server/configs/env"
 	"gin-server/server/configs/logger"
 	"gin-server/server/dbs"
+	"gin-server/server/globals"
 	"gin-server/server/middlewares"
 
+	otelgin "go.opentelemetry.io/contrib/instrumentation/github.com/gin-gonic/gin/otelgin"
+
 	// models "gin-server/server/models/mysql/go-sql-driver"
-	global "gin-server/server/globals"
 	models "gin-server/server/models/mysql/gorm"
 	v1 "gin-server/server/routers/v1"
 	"net/http"
@@ -24,7 +26,7 @@ func main() {
 	if goEnv == "production" {
 		gin.SetMode(gin.ReleaseMode)
 	}
-	tp, _ := global.InitOtelTracer()
+	tp, _ := globals.InitOtelTracer()
 
 	if tp != nil {
 		defer tp.Shutdown(context.Background())
@@ -44,6 +46,11 @@ func main() {
 
 	router := server.CreateRouter()
 
+	otelEnabled, _ := env.GetEnv("OTEL_ENABLED")
+
+	if otelEnabled == "yes" {
+		router.Use(otelgin.Middleware(globals.SERVER_NAME))
+	}
 	// 中间件中的c.Next()方法，表示执行接口中的逻辑，一个中间件不调用c.Next()，则全部当成前置中间件，执行顺序与注册顺序一致
 	// 一个中间件调用c.Next()，则中间件中c.Next()调用前的代码遵循先注册的中间件先执行，c.Next()调用后的代码遵循先注册的中间件后执行
 	// 所有中间件c.Next()前的代码，c.Next()，c.Next()后的代码，组成了一个洋葱模型：
