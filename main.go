@@ -26,11 +26,6 @@ func main() {
 	if goEnv == "production" {
 		gin.SetMode(gin.ReleaseMode)
 	}
-	tp, _ := globals.InitOtelTracer()
-
-	if tp != nil {
-		defer tp.Shutdown(context.Background())
-	}
 
 	defer logger.Close()
 
@@ -49,6 +44,9 @@ func main() {
 	otelEnabled, _ := env.GetEnv("OTEL_ENABLED")
 
 	if otelEnabled == "yes" {
+		tp := globals.InitOtelTracer()
+		defer tp.Shutdown(context.Background())
+
 		router.Use(otelgin.Middleware(globals.SERVER_NAME))
 	}
 	// 中间件中的c.Next()方法，表示执行接口中的逻辑，一个中间件不调用c.Next()，则全部当成前置中间件，执行顺序与注册顺序一致
@@ -69,7 +67,7 @@ func main() {
 
 	router.NoRoute(middlewares.NoRouteHandle) // 因为gin默认处理了404，所以这里需要自定义处理404
 	router.Use(middlewares.ExceptionHandle)
-	router.Use(middlewares.AcceptRequestHandle(tp))
+	router.Use(middlewares.AcceptRequestHandle)
 
 	v1.RegisterV1Routes(router)
 

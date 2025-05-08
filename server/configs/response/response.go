@@ -5,13 +5,14 @@ import (
 	"net/http"
 	"runtime/debug"
 
-	"gin-server/server/configs/env"
 	httpError "gin-server/server/configs/error"
 	"gin-server/server/configs/logger"
 	"gin-server/server/globals"
 
 	"github.com/gin-gonic/gin"
-	"go.uber.org/zap"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/codes"
+	"go.opentelemetry.io/otel/trace"
 )
 
 type response struct {
@@ -40,13 +41,16 @@ func (response *response) Success(data ...any) {
 		panic(globals.NewException(err.Error()))
 	}
 	logMsg := "[http-response] " + response.ctx.Request.Method + ": " + response.ctx.Request.URL.RequestURI() + " => " + string(responseDataJson)
-	otelEnabled, _ := env.GetEnv("OTEL_ENABLED")
 
-	if otelEnabled == "yes" {
-		logger.TraceLog.Info(logMsg, zap.Any("ctx", response.ctx.Request.Context()))
-	} else {
-		logger.TraceLog.Info(logMsg)
+	span := trace.SpanFromContext(response.ctx.Request.Context())
+
+	if span.IsRecording() {
+		span.AddEvent("http-response", trace.WithAttributes(
+			attribute.String("log", logMsg),
+		))
 	}
+
+	logger.TraceLog.Info(logMsg)
 	response.ctx.JSON(http.StatusOK, result)
 }
 
@@ -64,7 +68,8 @@ func (response *response) Failed(data ...any) {
 	errorException := globals.NewException(data...)
 	status := httpError.ErrorCodeMap[errorException.Code]
 	errorLogMsg := "[http-response] " + response.ctx.Request.Method + ": " + response.ctx.Request.URL.RequestURI() + " => "
-	otelEnabled, _ := env.GetEnv("OTEL_ENABLED")
+
+	span := trace.SpanFromContext(response.ctx.Request.Context())
 	responseDataJson, err := json.MarshalIndent(errorException, "", "    ")
 
 	if err != nil {
@@ -75,22 +80,29 @@ func (response *response) Failed(data ...any) {
 		jsonData, _ := json.MarshalIndent(errorException, "", "    ")
 		errorLogMsg = errorLogMsg + string(jsonData)
 
-		if otelEnabled == "yes" {
-			logger.TraceLog.Error(errorLogMsg, zap.Any("ctx", response.ctx.Request.Context()))
-		} else {
-			logger.TraceLog.Error(errorLogMsg)
+		if span.IsRecording() {
+			span.SetStatus(codes.Error, errorException.Message)
+			span.AddEvent("http-error", trace.WithAttributes(
+				attribute.String("log", errorLogMsg),
+				attribute.String("stack", string(debug.Stack())),
+			))
 		}
 
+		logger.TraceLog.Error(errorLogMsg)
 		response.ctx.JSON(status, errorException)
 		return
 	}
 
 	errorLogMsg = errorLogMsg + string(responseDataJson)
-	if otelEnabled == "yes" {
-		logger.TraceLog.Error(errorLogMsg, zap.Any("ctx", response.ctx.Request.Context()))
-	} else {
-		logger.TraceLog.Error(errorLogMsg)
+
+	if span.IsRecording() {
+		span.SetStatus(codes.Error, errorException.Message)
+		span.AddEvent("http-error", trace.WithAttributes(
+			attribute.String("log", errorLogMsg),
+			attribute.String("stack", string(debug.Stack())),
+		))
 	}
 
+	logger.TraceLog.Error(errorLogMsg)
 	response.ctx.JSON(status, errorException)
 }
