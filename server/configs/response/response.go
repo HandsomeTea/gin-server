@@ -48,6 +48,9 @@ func (response *response) Success(data ...any) {
 		span.AddEvent("http-response", trace.WithAttributes(
 			attribute.String("log", logMsg),
 		))
+
+		spanContext := span.SpanContext()
+		logMsg = "[" + spanContext.TraceID().String() + "|" + spanContext.SpanID().String() + "|] " + logMsg
 	}
 
 	logger.TraceLog.Info(logMsg)
@@ -86,6 +89,9 @@ func (response *response) Failed(data ...any) {
 				attribute.String("log", errorLogMsg),
 				attribute.String("stack", string(debug.Stack())),
 			))
+
+			spanContext := span.SpanContext()
+			errorLogMsg = "[" + spanContext.TraceID().String() + "|" + spanContext.SpanID().String() + "|] " + errorLogMsg
 		}
 
 		logger.TraceLog.Error(errorLogMsg)
@@ -101,6 +107,9 @@ func (response *response) Failed(data ...any) {
 			attribute.String("log", errorLogMsg),
 			attribute.String("stack", string(debug.Stack())),
 		))
+
+		spanContext := span.SpanContext()
+		errorLogMsg = "[" + spanContext.TraceID().String() + "|" + spanContext.SpanID().String() + "|] " + errorLogMsg
 	}
 
 	logger.TraceLog.Error(errorLogMsg)

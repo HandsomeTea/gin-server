@@ -95,6 +95,9 @@ func AcceptRequestHandle(c *gin.Context) {
 		span.AddEvent("http-request", trace.WithAttributes(
 			attribute.String("log", logMsg),
 		))
+
+		spanContext := span.SpanContext()
+		logMsg = "[" + spanContext.TraceID().String() + "|" + spanContext.SpanID().String() + "|] " + logMsg
 	}
 
 	logger.TraceLog.Info(logMsg)
